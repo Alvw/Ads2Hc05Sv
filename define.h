@@ -7,6 +7,7 @@ typedef unsigned int uint;
 //#define BATT_FULL_TH  837 // 3,80Â
 //-----------------
 #define BATT_LOW_TH  6700 
+//#define BATT_LOW_TH  7800
 //-----------------
 //#define BATT_MID_TH   805 // 3,65Â
 //#define BATT_LOW_TH   770 // 3,50Â

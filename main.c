@@ -29,7 +29,6 @@ uchar rfResetCntr = 0;
 uint powerUpCntr = 1;
 uchar btnCntr = 0;
 uchar isRecording = 0;
-uint batteryVoltage = 800;
 uint sumBatteryVoltage = 8000;
 uchar batteryCntr = 0;
 
@@ -187,12 +186,14 @@ void stopRecording(){
 }
 
 void addBatteryData(uint battValue){
-  batteryVoltage +=battValue;
+  sumBatteryVoltage +=battValue;
   batteryCntr++;
   if(batteryCntr == 10){
-      sumBatteryVoltage = batteryVoltage;
-      batteryVoltage = 0;
-      batteryCntr = 0;
+    if(sumBatteryVoltage < BATT_LOW_TH){
+        if(shutDownCntr == 0) {shutDownCntr = 1;}  
+     }
+    sumBatteryVoltage = 0;
+    batteryCntr = 0;
   }
 }
 
@@ -207,7 +208,6 @@ __interrupt void Port1_ISR(void)
     AFE_Read_Data(&new_data[0]);
     loffStat = AFE_getLoffStatus();
     ADC10_Read_Data(&new_data[2]);
-	addBatteryData(new_data[5]);
     ADC10_Measure();
     if(packetAddNewData(new_data)){
       packetDataReady = 1;
@@ -248,7 +248,7 @@ TACTL &= ~TAIFG;
       rfConStat = 0;
   }
   if(!lowBatteryMessageAlreadySent){    
-      if(sumBatteryVoltage < BATT_LOW_TH){
+      if(batteryVoltage < BATT_LOW_TH){
         lowBatteryMessageAlreadySent = 1;
         rf_send(lowBatteryMessage,7);
         if(shutDownCntr == 0) {shutDownCntr = 1;}  
