@@ -18,7 +18,12 @@ void sys_init(){
   
   BCSCTL1 |= XTS;                           // ACLK = LFXT1 = HF XTAL
   BCSCTL3 |= LFXT1S1;                       // 3 Ц 16MHz crystal or resonator
-  IE1 |= OFIE;                              // Enable osc fault interrupt 
+  volatile unsigned int i;
+  do {
+    IFG1 &= ~OFIFG;                         // Clear OSCFault flag
+    for (i = 0xFF; i > 0; i--);             // Time for flag to set
+  } while (IFG1 & OFIFG);                     // OSCFault flag still set?
+  BCSCTL2 |= SELS + DIVS_3;                        // SMCLK = LFXT1 / 8; 
   
   //LED
   P1DIR |= BIT7;
@@ -78,19 +83,6 @@ void sys_init(){
   TACTL &= ~TAIFG;      // —брос прерывани€
   TACTL |= MC_1;
 }
-
-#pragma bis_nmi_ie1=OFIE                    // Re-enable osc fault interrupt
-#pragma vector=NMI_VECTOR
-__interrupt void NMI_ISR(void)
-{
-  volatile unsigned int i;
-  BCSCTL2 &= ~SELS;                       // Ensure SMCLK runs from DCO 
-  do {
-    IFG1 &= ~OFIFG;                         // Clear OSCFault flag
-    for (i = 0xFF; i > 0; i--);             // Time for flag to set
-  } while (IFG1 & OFIFG);                     // OSCFault flag still set?
-  BCSCTL2 |= SELS;                        // SMCLK = LFXT1 / 8;
-} 
 
 void led(uchar state){
   if(state){
