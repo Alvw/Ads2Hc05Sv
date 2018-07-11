@@ -1,5 +1,5 @@
-//#include <msp430.h>
-#include "io430.h"
+#include <msp430.h>
+//#include "io430.h"
 #include "ADC10.h"
 
 uint ADC10_DMA_Data[4];

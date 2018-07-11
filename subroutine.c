@@ -1,5 +1,5 @@
-//#include <msp430.h>
-#include "io430.h"
+#include <msp430.h>
+//#include "io430.h"
 #include "subroutine.h"
 
 //Инициализация микроконтроллера
@@ -67,12 +67,14 @@ void sys_init(){
   P4DIR |= BIT0 + BIT1 + BIT2 + BIT3;
   P4OUT &= ~(BIT0 + BIT1 + BIT2 + BIT3); 
   
-  // Таймер  
-  TACTL_bit.TACLR  = 1; // Reset TAR, divider and count dir
+  // Таймер 
+  TACTL |= TACLR;
+  //TACTL_bit.TACLR  = 1; // Reset TAR, divider and count dir
   TACTL = TASSEL_2;     // SMCLK
   TACTL |= ID_2 + ID_1; // 1:8  
   TACCR0 = 0x00;
-  TACTL_bit.TAIE = 1;   // INT enable 
+  TACTL |= TAIE;
+ // TACTL_bit.TAIE = 1;   // INT enable 
   TACTL &= ~TAIFG;      // Сброс прерывания
   TACTL |= MC_1;
 }
